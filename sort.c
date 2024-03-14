@@ -29,8 +29,49 @@ size_t Size(void* ptr)
 
 // implement merge sort
 // extraMemoryAllocated counts bytes of extra memory allocated
-void mergeSort(int pData[], int l, int r)
-{
+void mergeSort(int pData[], int l, int r) {
+    // Will Serface's Implementation
+
+    if (r - l <= 0) { // Recursive Exit Case
+        return; // List with 1 or fewer elements is sorted
+    } else {
+        int mid = l + (r - l) / 2; // Find middle index of sort
+        mergeSort(pData, l, mid); // Sort lower half of index
+        mergeSort(pData, mid + 1, r); // Sort upper half of index
+
+        int left = mid - l + 1, right = r - mid; // Calculate sizes of left and right arrays to be allocated
+
+        int *leftArray = Alloc(left * sizeof(int)), // Allocate memory for left (lower) half of array
+        *rightArray = Alloc(right * sizeof(int)); // Allocate memory for right (upper) half of array
+
+        for (int i = l; i <= r; ++i) { // Repeat for each item in l to r range
+            if (i <= mid) { // Check which array to populate
+                leftArray[i - l] = pData[i]; // Save item to lower array
+            } else {
+                rightArray[i - mid - 1] = pData[i]; // Save item to upper array
+            }
+        }
+
+        int lIndex = 0, rIndex = 0; // Tracks the current merge index of lower and upper arrays
+
+        for (int i = l; i <= r; ++i) { // Loop through all numbers to be merged
+            if (lIndex >= left) { // Check if lower array is empty
+                pData[i] = rightArray[rIndex++]; // Load current index of Data from upper array
+            } else if (rIndex >= right) { // Check if upper array is empty
+                pData[i] = leftArray[lIndex++]; // Load current index of Data from lower array
+            } else { // Both arrays have items remaining
+                if (leftArray[lIndex] < rightArray[rIndex]) { // Compare current indexes of lower and upper arrays
+                    pData[i] = leftArray[lIndex++]; // Load current index of Data from lower array
+                } else {
+                    pData[i] = rightArray[rIndex++]; // Load current index of Data from upper array
+                }
+            }
+        }
+
+        // Deallocate memory for lower and upper arrays
+        DeAlloc(leftArray);
+        DeAlloc(rightArray);
+    }
 }
 
 // parses input file to an integer array
